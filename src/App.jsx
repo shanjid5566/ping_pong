@@ -17,6 +17,50 @@ function App() {
   const gameRef = useRef();
   const intervalRef = useRef();
 
+  // Ball movement
+  useEffect(() => {
+    if (isRunning) {
+      intervalRef.current = setInterval(() => {
+        setBall((prev) => {
+          let newX = prev.x + prev.dx;
+          let newY = prev.y + prev.dy;
+          let newDx = prev.dx;
+          let newDy = prev.dy;
+
+          // Top & Bottom Wall collision
+          if (newY <= 0 || newY >= HEIGHT - BALL_SIZE) newDy = -newDy;
+
+          // Left paddle collision
+          if (
+            newX <= PADDLE_WIDTH &&
+            newY + BALL_SIZE >= paddleY &&
+            newY <= paddleY + PADDLE_HEIGHT
+          ) {
+            newDx = -newDx; // bounce
+          }
+
+          // Right wall collision
+          if (newX >= WIDTH - BALL_SIZE) {
+            newDx = -newDx; // bounce from right
+          }
+
+          // Reset if ball goes beyond left paddle
+          if (newX < 0) {
+            newX = WIDTH / 2;
+            newY = HEIGHT / 2;
+            newDx = 3;
+            newDy = 3;
+          }
+
+          return { x: newX, y: newY, dx: newDx, dy: newDy };
+        });
+      }, 16);
+    } else {
+      clearInterval(intervalRef.current);
+    }
+
+    return () => clearInterval(intervalRef.current);
+  }, [isRunning, paddleY]);
 
   // Mouse control
   const handleMouseMove = (e) => {
