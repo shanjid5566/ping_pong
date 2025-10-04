@@ -18,7 +18,6 @@ function App() {
   const intervalRef = useRef();
 
 
-
   // Mouse control
   const handleMouseMove = (e) => {
     const rect = gameRef.current.getBoundingClientRect();
@@ -28,7 +27,18 @@ function App() {
     setPaddleY(newY);
   };
 
-
+  // Keyboard control
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowUp") {
+        setPaddleY((prev) => Math.max(prev - PADDLE_SPEED, 0));
+      } else if (e.key === "ArrowDown") {
+        setPaddleY((prev) => Math.min(prev + PADDLE_SPEED, HEIGHT - PADDLE_HEIGHT));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleStart = () => setIsRunning(true);
   const handlePause = () => setIsRunning(false);
